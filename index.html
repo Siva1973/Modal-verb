@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Usage of Modal Verb</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #e0f7fa;
+      text-align: center;
+      padding: 20px;
+    }
+    .question-box {
+      background: #ffffff;
+      padding: 25px;
+      margin: 20px auto;
+      border-radius: 12px;
+      max-width: 600px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .score {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+    .gif-container img {
+      width: 220px;
+      height: auto;
+      margin-top: 15px;
+    }
+    .btn {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .question-number {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    .feedback {
+      font-size: 20px;
+      margin-top: 10px;
+      color: #00695c;
+      min-height: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>The Usage of Modal Verb</h1>
+  <div class="question-box">
+    <div class="question-number" id="questionNumber">Question 1 of 10</div>
+    <p id="question">Loading question...</p>
+    <div id="answers"></div>
+    <button class="btn" onclick="submitAnswer()">Submit Answer</button>
+    <p class="feedback" id="feedback"></p>
+    <p class="score" id="scoreDisplay">Score: 0</p>
+    <div class="gif-container"><img id="gif" src="" alt=""></div>
+  </div>
+
+  <!-- Audio Feedback -->
+  <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-09.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="https://www.bensound.com/bensound-music/bensound-buddy.mp3" loop autoplay></audio>
+
+  <script>
+    const questions = [
+      {
+        question: "You ___ see a doctor if you feel sick.",
+        options: ["must", "can", "may", "shall"],
+        answer: "must",
+        explanation: "‘Must’ is used to express necessity or strong advice."
+      },
+      {
+        question: "She ___ speak five languages fluently.",
+        options: ["can", "must", "might", "shall"],
+        answer: "can",
+        explanation: "‘Can’ is used to express ability."
+      },
+      {
+        question: "He ___ be at home. I saw his car outside.",
+        options: ["must", "should", "can", "would"],
+        answer: "must",
+        explanation: "‘Must’ is used to express a logical conclusion."
+      },
+      {
+        question: "___ I open the window?",
+        options: ["Shall", "Will", "May", "Would"],
+        answer: "May",
+        explanation: "‘May’ is used to ask for permission formally."
+      },
+      {
+        question: "You ___ park here. It's not allowed.",
+        options: ["must not", "can't", "won't", "needn't"],
+        answer: "must not",
+        explanation: "‘Must not’ is used to express prohibition."
+      },
+      {
+        question: "You ___ try this cake. It's delicious!",
+        options: ["should", "could", "must", "might"],
+        answer: "should",
+        explanation: "‘Should’ is used for giving recommendations or advice."
+      },
+      {
+        question: "They ___ be tired after the long journey.",
+        options: ["might", "can", "shall", "must"],
+        answer: "might",
+        explanation: "‘Might’ expresses possibility, not certainty."
+      },
+      {
+        question: "I ___ help you with your homework.",
+        options: ["can", "would", "shall", "might"],
+        answer: "can",
+        explanation: "‘Can’ is used to express ability or offer help."
+      },
+      {
+        question: "We ___ go now or we’ll be late.",
+        options: ["must", "can", "would", "might"],
+        answer: "must",
+        explanation: "‘Must’ expresses urgency or necessity."
+      },
+      {
+        question: "You ___ smoke in here. It’s a no-smoking area.",
+        options: ["must not", "can", "may", "could"],
+        answer: "must not",
+        explanation: "‘Must not’ shows strong prohibition."
+      }
+    ];
+
+    const correctGif = "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif";
+    const wrongGif = "https://media.giphy.com/media/3o6ZtaO9BZHcOjmErm/giphy.gif";
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question").textContent = q.question;
+      document.getElementById("questionNumber").textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+      q.options.forEach(option => {
+        const label = document.createElement("label");
+        label.innerHTML = `
+          <input type="radio" name="answer" value="${option}"> ${option}<br>
+        `;
+        answersDiv.appendChild(label);
+      });
+      document.getElementById("gif").src = "";
+      document.getElementById("feedback").textContent = "";
+    }
+
+    function submitAnswer() {
+      const radios = document.getElementsByName("answer");
+      let selected = "";
+      for (let radio of radios) {
+        if (radio.checked) {
+          selected = radio.value;
+          break;
+        }
+      }
+
+      if (selected === "") {
+        alert("Please select an answer!");
+        return;
+      }
+
+      const correctAudio = document.getElementById("correctSound");
+      const wrongAudio = document.getElementById("wrongSound");
+      const gif = document.getElementById("gif");
+      const feedback = document.getElementById("feedback");
+
+      const current = questions[currentQuestion];
+
+      if (selected === current.answer) {
+        score++;
+        correctAudio.play();
+        gif.src = correctGif;
+        feedback.innerHTML = `<strong>Correct!</strong> ${current.explanation}`;
+      } else {
+        wrongAudio.play();
+        gif.src = wrongGif;
+        feedback.innerHTML = `<strong>Wrong!</strong> ${current.explanation}`;
+      }
+
+      document.getElementById("scoreDisplay").textContent = "Score: " + score;
+
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        setTimeout(loadQuestion, 3000); // Wait before moving to next question
+      } else {
+        setTimeout(() => {
+          document.getElementById("question").textContent = "🎉 Game Over! Final Score: " + score + " / " + questions.length;
+          document.getElementById("answers").innerHTML = "";
+          document.querySelector(".btn").style.display = "none";
+          document.getElementById("questionNumber").style.display = "none";
+          feedback.innerHTML = "";
+        }, 3000);
+      }
+    }
+
+    window.onload = () => {
+      document.getElementById("bgMusic").volume = 0.2;
+      loadQuestion();
+    };
+  </script>
+</body>
+</html>
